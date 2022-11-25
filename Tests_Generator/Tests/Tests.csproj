@@ -14,4 +14,24 @@
         <PackageReference Include="coverlet.collector" Version="3.1.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="tests\**" />
+      <Compile Remove="files\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="tests\**" />
+      <EmbeddedResource Remove="files\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="tests\**" />
+      <None Remove="files\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Application\Application.csproj" />
+      <ProjectReference Include="..\Tests_Generator\Tests_Generator.csproj" />
+    </ItemGroup>
+
 </Project>

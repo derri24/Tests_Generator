@@ -38,19 +38,35 @@ void CreateTestFile(string path, string content)
     fileStream.Close();
 }
 
-int GetSectionCount()
+int GetCountParallelLoadFiles()
 {
-    Console.WriteLine("Enter count of sections: ");
+    Console.WriteLine("Enter count parallel loaded files: ");
     return Convert.ToInt32(Console.ReadLine());
 }
 
+int GetCountParallelProcessedTasks()
+{
+    Console.WriteLine("Enter count parallel processed tasks: ");
+    return Convert.ToInt32(Console.ReadLine());
+}
+
+int GetCountParallelWrittenFiles()
+{
+    Console.WriteLine("Enter count parallel written files: ");
+    return Convert.ToInt32(Console.ReadLine());
+}
+
+
 void Main()
 {
+    int parallelLoadFiles= GetCountParallelLoadFiles();
+    int parallelProcessedTasks=GetCountParallelProcessedTasks();
+    int parallelWrittenFiles = GetCountParallelWrittenFiles();
+    
     var directoryPath = GetFilesDirectoryPath();
     Dictionary<string, string> tests = new Dictionary<string, string>();
 
     var filePaths = GetFilesFromDirectory(directoryPath);
-    var sectionCount = GetSectionCount();
     foreach (var filePath in filePaths)
     {
         var content = ReadFileContent($"{directoryPath}\\{filePath.Name}");
