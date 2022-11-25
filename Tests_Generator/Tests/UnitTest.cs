@@ -1,11 +1,6 @@
-using System.Collections.Generic;
+
 using System.IO;
 using System.Linq;
-using System.Net.Mime;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Tests_Generator;
 
@@ -24,23 +19,7 @@ public class UnitTest
         return content;
     }
 
-    private static Dictionary<string, List<string>> GetDataDictionary(string content)
-    {
-        SyntaxTree tree = CSharpSyntaxTree.ParseText(content);
-        CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
-        Dictionary<string, List<string>> dataDictionary = new Dictionary<string, List<string>>();
-        var classNames = root.DescendantNodes().OfType<ClassDeclarationSyntax>();
-        foreach (var className in classNames)
-        {
-            List<string> methodNames = new List<string>();
-            foreach (var method in className.Members)
-                methodNames.Add(((MethodDeclarationSyntax) method).Identifier.ToString());
-            dataDictionary.Add(className.Identifier.ToString(), methodNames);
-        }
-        return dataDictionary;
-    }
 
-    
     [TestMethod]
     public void CountClassesTest()
     {
@@ -58,18 +37,15 @@ public class UnitTest
     public void SameMethodNamesTest()
     {
         var oneDuplicatesMethodName = ReadFileContent("files\\OneDuplicatesMethodName.cs");
-        var dataDictionary = GetDataDictionary(oneDuplicatesMethodName);
-        var firstDuplicates = dataDictionary.GroupBy(methodName => methodName)
-            .Where(methodName => methodName.Count() > 1).ToList();
-        Assert.AreEqual(0, firstDuplicates.Count);
-
+        var firstTestsContent = TestsGenerator.GetTestDictionary(oneDuplicatesMethodName);
+        Assert.IsFalse(firstTestsContent.Values.First().Contains("ThirdMethodTest"));
+        
         var twoDuplicatesMethodName = ReadFileContent("files\\TwoDuplicatesMethodName.cs");
-        var secondDataDictionary = GetDataDictionary(twoDuplicatesMethodName);
-        var secondDuplicates = secondDataDictionary.GroupBy(methodName => methodName)
-            .Where(methodName => methodName.Count() > 1).ToList();
-        Assert.AreEqual(0, secondDuplicates.Count);
+        var secondTestsContent = TestsGenerator.GetTestDictionary(twoDuplicatesMethodName);
+        Assert.IsFalse(secondTestsContent.Values.First().Contains("ThirdMethodTest"));
+        Assert.IsFalse(secondTestsContent.Values.First().Contains("FirstMethodTest"));
     }
-
+    
     
     [TestMethod]
     public void ResultContentTest()

@@ -1,4 +1,5 @@
-﻿using Tests_Generator;
+﻿using System.Threading.Tasks.Dataflow;
+using Tests_Generator;
 
 
 string GetFilesDirectoryPath()
@@ -56,12 +57,11 @@ int GetCountParallelWrittenFiles()
     return Convert.ToInt32(Console.ReadLine());
 }
 
-
 void Main()
 {
-    int parallelLoadFiles= GetCountParallelLoadFiles();
-    int parallelProcessedTasks=GetCountParallelProcessedTasks();
-    int parallelWrittenFiles = GetCountParallelWrittenFiles();
+  //  int parallelLoadFiles= GetCountParallelLoadFiles();
+  //  int parallelProcessedTasks=GetCountParallelProcessedTasks();
+  //  int parallelWrittenFiles = GetCountParallelWrittenFiles();
     
     var directoryPath = GetFilesDirectoryPath();
     Dictionary<string, string> tests = new Dictionary<string, string>();
