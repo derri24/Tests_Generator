@@ -20,7 +20,6 @@ public static class TestsGenerator
                 }
             }
         }
-
         return methodNames;
     }
 
@@ -72,7 +71,6 @@ public class UnitTest" +countTests+ "{" +
                 methodNames.Add(((MethodDeclarationSyntax) method).Identifier.ToString());
             dataDictionary.Add(className.Identifier.ToString(), methodNames);
         }
-
         return dataDictionary;
     }
 
@@ -85,7 +83,6 @@ public class UnitTest" +countTests+ "{" +
             var testContent = GenerateTestContent(dataDictionaryElement.Value);
             testContents.Add(dataDictionaryElement.Key, testContent);
         }
-
         return testContents;
     }
 }

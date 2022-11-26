@@ -1,17 +1,15 @@
 ﻿using System.Threading.Tasks.Dataflow;
 using Tests_Generator;
 
-
 string GetFilesDirectoryPath()
 {
     Console.WriteLine("Enter files directory path: ");
     return Console.ReadLine();
 }
 
-List<FileInfo> GetFilesFromDirectory(string path)
+List<string> GetFilesFromDirectory(string path)
 {
-    DirectoryInfo directoryInfo = new DirectoryInfo(path);
-    return directoryInfo.GetFiles().ToList();
+    return Directory.GetFiles(path, "*.cs").ToList();
 }
 
 string ReadFileContent(string path)
@@ -39,7 +37,7 @@ void CreateTestFile(string path, string content)
     fileStream.Close();
 }
 
-int GetCountParallelLoadFiles()
+int GetCountParallelLoadedFiles()
 {
     Console.WriteLine("Enter count parallel loaded files: ");
     return Convert.ToInt32(Console.ReadLine());
@@ -57,27 +55,37 @@ int GetCountParallelWrittenFiles()
     return Convert.ToInt32(Console.ReadLine());
 }
 
-void Main()
+async Task Main()
 {
-  //  int parallelLoadFiles= GetCountParallelLoadFiles();
-  //  int parallelProcessedTasks=GetCountParallelProcessedTasks();
-  //  int parallelWrittenFiles = GetCountParallelWrittenFiles();
-    
-    var directoryPath = GetFilesDirectoryPath();
-    Dictionary<string, string> tests = new Dictionary<string, string>();
+    var countParallelLoadedFiles = GetCountParallelLoadedFiles();
+    var countParallelProcessedTasks = GetCountParallelProcessedTasks();
+    var countParallelWrittenFiles = GetCountParallelWrittenFiles();
 
-    var filePaths = GetFilesFromDirectory(directoryPath);
-    foreach (var filePath in filePaths)
-    {
-        var content = ReadFileContent($"{directoryPath}\\{filePath.Name}");
-        var resultTests = TestsGenerator.GetTestDictionary(content);
-        foreach (var resultTest in resultTests)
-            tests.Add(resultTest.Key, resultTest.Value);
-    }
+    var directoryPath = GetFilesDirectoryPath();
     var testsDirectoryPath = GetTestsDirectoryPath();
-    foreach (var test in tests)
-        CreateTestFile($"{testsDirectoryPath}\\{test.Key}.cs", test.Value);
+    
+    var optionsLoadedFiles = new ExecutionDataflowBlockOptions() {MaxDegreeOfParallelism = countParallelLoadedFiles};
+    var optionsProcessedTasks = new ExecutionDataflowBlockOptions() {MaxDegreeOfParallelism = countParallelProcessedTasks};
+    var optionsWrittenFiles = new ExecutionDataflowBlockOptions() {MaxDegreeOfParallelism = countParallelWrittenFiles};
+
+    var listFilesBlock = new TransformManyBlock<string, string>(GetFilesFromDirectory);
+    var getFilesContentBlock = new TransformBlock<string, string>(ReadFileContent, optionsLoadedFiles);
+    var getGenerateResultsBlock = new TransformBlock<string, Dictionary<string, string>>(TestsGenerator.GetTestDictionary, optionsProcessedTasks);
+    var getDictionaryPairsBlock = new TransformManyBlock<Dictionary<string, string>, KeyValuePair<string, string>>
+        (dictionary => dictionary.ToList());
+    var createTestFileBlockBlock = new ActionBlock<KeyValuePair<string, string>>(
+        test => { CreateTestFile($"{testsDirectoryPath}\\{test.Key}.cs", test.Value); }, optionsWrittenFiles);
+
+    var linkOptions = new DataflowLinkOptions {PropagateCompletion = true};
+    listFilesBlock.LinkTo(getFilesContentBlock, linkOptions);
+    getFilesContentBlock.LinkTo(getGenerateResultsBlock, linkOptions);
+    getGenerateResultsBlock.LinkTo(getDictionaryPairsBlock, linkOptions);
+    getDictionaryPairsBlock.LinkTo(createTestFileBlockBlock, linkOptions);
+
+    await listFilesBlock.SendAsync(directoryPath);
+    listFilesBlock.Complete();
+    await createTestFileBlockBlock.Completion;
     Console.WriteLine("Test generation is successful!!!");
 }
 
-Main();
+await Main();
