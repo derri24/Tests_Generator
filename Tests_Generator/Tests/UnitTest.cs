@@ -8,24 +8,14 @@ namespace Tests;
 [TestClass]
 public class UnitTest
 {
-    private string ReadFileContent(string path)
-    {
-        FileStream fileStream = new FileStream(path, FileMode.Open);
-        StreamReader streamReader = new StreamReader(fileStream);
-        var content = streamReader.ReadToEnd();
-        streamReader.Close();
-        fileStream.Close();
-        return content;
-    }
-
     [TestMethod]
     public void CountClassesTest()
     {
-        var oneClassContent = ReadFileContent("files\\OneClass.cs");
+        var oneClassContent =FileSystem.ReadFile("files\\OneClass.cs");
         var firstResultClasses = TestsGenerator.GetTestDictionary(oneClassContent);
         Assert.AreEqual(1, firstResultClasses.Keys.Count);
 
-        var twoClassesContent = ReadFileContent("files\\TwoClasses.cs");
+        var twoClassesContent = FileSystem.ReadFile("files\\TwoClasses.cs");
         var secondResultClasses = TestsGenerator.GetTestDictionary(twoClassesContent);
         Assert.AreEqual(2, secondResultClasses.Keys.Count);
     }
@@ -33,11 +23,11 @@ public class UnitTest
     [TestMethod]
     public void SameMethodNamesTest()
     {
-        var oneDuplicatesMethodName = ReadFileContent("files\\OneDuplicatesMethodName.cs");
+        var oneDuplicatesMethodName =FileSystem.ReadFile("files\\OneDuplicatesMethodName.cs");
         var firstTestsContent = TestsGenerator.GetTestDictionary(oneDuplicatesMethodName);
         Assert.IsFalse(firstTestsContent.Values.First().Contains("ThirdMethodTest"));
         
-        var twoDuplicatesMethodName = ReadFileContent("files\\TwoDuplicatesMethodName.cs");
+        var twoDuplicatesMethodName = FileSystem.ReadFile("files\\TwoDuplicatesMethodName.cs");
         var secondTestsContent = TestsGenerator.GetTestDictionary(twoDuplicatesMethodName);
         Assert.IsFalse(secondTestsContent.Values.First().Contains("ThirdMethodTest"));
         Assert.IsFalse(secondTestsContent.Values.First().Contains("FirstMethodTest"));
@@ -46,7 +36,7 @@ public class UnitTest
     [TestMethod]
     public void ResultContentTest()
     {
-        var oneClassContent = ReadFileContent("files\\OneClass.cs");
+        var oneClassContent = FileSystem.ReadFile("files\\OneClass.cs");
         var testsContent = TestsGenerator.GetTestDictionary(oneClassContent);
         Assert.AreEqual(1, testsContent.Keys.Count);
         Assert.IsTrue(testsContent.Values.First().Contains("ATest()"));

@@ -28,7 +28,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Application\Application.csproj" />
-      <ProjectReference Include="..\Tests_Generator\Tests_Generator.csproj" />
     </ItemGroup>
 
 </Project>
