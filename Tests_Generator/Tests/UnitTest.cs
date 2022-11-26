@@ -18,7 +18,6 @@ public class UnitTest
         return content;
     }
 
-
     [TestMethod]
     public void CountClassesTest()
     {
@@ -31,7 +30,6 @@ public class UnitTest
         Assert.AreEqual(2, secondResultClasses.Keys.Count);
     }
 
-    
     [TestMethod]
     public void SameMethodNamesTest()
     {
@@ -44,7 +42,6 @@ public class UnitTest
         Assert.IsFalse(secondTestsContent.Values.First().Contains("ThirdMethodTest"));
         Assert.IsFalse(secondTestsContent.Values.First().Contains("FirstMethodTest"));
     }
-    
     
     [TestMethod]
     public void ResultContentTest()
