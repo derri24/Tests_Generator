@@ -4,7 +4,6 @@ namespace Tests_Generator;
 
 public static class DataFlow
 {
-
     public static async Task Run(int countParallelLoadedFiles,int countParallelProcessedTasks,
         int countParallelWrittenFiles,string directoryPath,string testsDirectoryPath)
     {
